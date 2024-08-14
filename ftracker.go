@@ -12,6 +12,7 @@ const (
 	minInH    = 60    // количество минут в часе.
 	kmhInMsec = 0.278 // коэффициент для преобразования км/ч в м/с.
 	cmInM     = 100   // количество сантиметров в метре.
+	secInM    = 60
 )
 
 // distance возвращает дистанцию(в километрах), которую преодолел пользователь за время тренировки.
@@ -82,7 +83,9 @@ const (
 // duration float64 — длительность тренировки в часах.
 func RunningSpentCalories(action int, weight, duration float64) float64 {
 	// ваш код здесь
-	return ((runningCaloriesMeanSpeedMultiplier * meanSpeed(action, duration) * runningCaloriesMeanSpeedShift) * weight / mInKm * duration * minInH)
+	meanSpeed := meanSpeed(action, duration)
+	calories := ((runningCaloriesMeanSpeedMultiplier * meanSpeed * runningCaloriesMeanSpeedShift) * weight / mInKm * duration * minInH)
+	return calories
 }
 
 // Константы для расчета калорий, расходуемых при ходьбе.
@@ -101,8 +104,11 @@ const (
 // height float64 — рост пользователя.
 func WalkingSpentCalories(action int, duration, weight, height float64) float64 {
 	// ваш код здесь
-	walkingSpeed := meanSpeed(action, duration) * kmhInMsec
-	return ((walkingCaloriesWeightMultiplier*weight + (math.Pow(walkingSpeed, 2)*kmhInMsec)/(height/cmInM)) * walkingCaloriesWeightMultiplier * weight) * duration * minInH
+	meanSpeed := meanSpeed(action, duration) * kmhInMsec
+	height /= cmInM
+	calories := ((walkingCaloriesWeightMultiplier*weight + (math.Pow(meanSpeed, 2)/height)*walkingSpeedHeightMultiplier*weight) * duration * minInH)
+
+	return calories
 }
 
 // Константы для расчета калорий, расходуемых при плавании.
